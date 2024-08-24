@@ -49,8 +49,11 @@ export class LoginComponent {
             type: '',
             text: '',
           };
+          console.log('came here1');
           this.authService.setLoggedIn(true);
+          console.log('came here2');
           this.router.navigate(['add-movie']);
+          console.log('came here3');
         },
         error: (err: any) => {
           console.log("Some error occurred :: " + err);
