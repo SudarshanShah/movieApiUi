@@ -5,9 +5,9 @@
     <div class="flex space-x-8">
       <a routerLink="/" class="hover:text-yellow-500 text-xl">Home</a>
       <div class="relative group">
-        <a class="hover:text-yellow-500 text-xl cursor-pointer">Movies</a>
+        <a *ngIf="isAdmin()" class="hover:text-yellow-500 text-xl cursor-pointer">Movies</a>
         <div class="absolute hidden group-hover:block bg-blue-800 rounded shadow-lg mt-1">
-          <a routerLink="/show-movies" class="block px-4 py-2 hover:bg-blue-700">Show Movies</a>
+          <a routerLink="/show-movies" class="block px-4 py-2 hover:bg-blue-700">Watch Movies</a>
           <a routerLink="/add-movie" class="block px-4 py-2 hover:bg-blue-700">Add Movie</a>
         </div>
       </div>
@@ -17,10 +17,9 @@
         <a *ngIf="!isLoggedIn()" routerLink="/register" class="bg-yellow-500 font-bold text-blue-900 px-3 py-2 rounded hover:bg-yellow-400">Register</a>
 
         <!-- For Logged in User -->
-        <div *ngIf="isLoggedIn()" class="flex items-center space-x-2">
-          <h2 class="font-bold text-yellow-300 px-3 py-2 rounded text-lg">{{name}}</h2>
+        <div *ngIf="isLoggedIn()" class="flex items-baseline space-x-2">
+          <h2 class="font-bold text-yellow-300 px-3 py-2 rounded text-lg">{{getName()}}</h2>
           <a (click)="logout()" class="text-white bg-red-500 hover:bg-red-700 px-4 py-2 rounded hover:cursor-pointer">Logout</a>
         </div>
     </div>
 </nav>
-  

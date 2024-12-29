@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { catchError, Observable, tap, throwError } from 'rxjs';
+import {AuthResponse, LoginRequest, RegisterRequest} from "../types/auth.type";
 
 @Injectable({
   providedIn: 'root'
@@ -13,19 +14,21 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  register(registerRequest: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.BASE_URL}/api/v1/auth/register`, registerRequest);
+  register(registerRequest: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.BASE_URL}/api/v1/auth/register`, registerRequest);
   }
 
   login(loginRequest: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.BASE_URL}/api/v1/auth/authenticate`, loginRequest)
+    return this.http.post<AuthResponse>(`${this.BASE_URL}/api/v1/auth/login`, loginRequest)
                .pipe(tap(response => {
                 if(response && response.token) {
                   sessionStorage.setItem('authToken', response.token);
                   sessionStorage.setItem('refreshToken', response.refreshToken);
                   sessionStorage.setItem('name', response.name);
-                  sessionStorage.setItem('username', response.username);
                   sessionStorage.setItem('email', response.email);
+
+                  const decoded: any = jwtDecode(response.token);
+                  sessionStorage.setItem('role', decoded.role[0].authority);
                 }
                }));
   }
@@ -34,8 +37,8 @@ export class AuthService {
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('name');
-    sessionStorage.removeItem('username');
     sessionStorage.removeItem('email');
+    sessionStorage.removeItem('role');
   }
 
   // this will check if token is present as well as it is not expired
@@ -51,7 +54,7 @@ export class AuthService {
   getLoggedInSignal(): WritableSignal<boolean> {
     return this.loggedIn;
   }
-  
+
   // If JWT expires, this method gives another JWT using refreshToken or proceeds to login page
   refreshToken(): Observable<any> {
     const refreshToken = sessionStorage.getItem('refreshToken');
@@ -72,25 +75,15 @@ export class AuthService {
   setToken(token: string) {
     sessionStorage.setItem('authToken', token);
   }
+
+  hasRole(role: string): boolean {
+    const token = sessionStorage.getItem('authToken'); // Retrieve the JWT
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken?.role[0]?.authority.includes(role); // Check if roles contain the required role
+    }
+    return false;
+  }
 }
 
-export type LoginRequest = {
-  email: string,
-  password: string,
-}
-
-export type RegisterRequest = {
-  name: string,
-  email: string,
-  username: string,
-  password: string,
-}
-
-export type AuthResponse = {
-  token: string,
-  refreshToken: string,
-  name: string,
-  username: string,
-  email: string,
-}
 

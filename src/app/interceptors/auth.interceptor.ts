@@ -1,6 +1,5 @@
 import {
     HttpErrorResponse,
-    HttpHandler,
     HttpHandlerFn,
     HttpRequest,
 } from '@angular/common/http';
@@ -16,7 +15,7 @@ export function authInterceptor(
     const authService = inject(AuthService);
 
     if (
-        req.url.includes('/authenticate') ||
+        req.url.includes('/login') ||
         req.url.includes('/register') ||
         req.url.includes('/refresh')
     ) {
